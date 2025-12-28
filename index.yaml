@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  my-app:
+  - apiVersion: v2
+    appVersion: 1.0.1
+    created: "2025-12-28T05:00:46.497653091Z"
+    description: A Helm chart for My App
+    digest: c68178cbbc6f28b5f99e41007e4efceef979da55f6756d0d254d687136721263
+    name: my-app
+    type: application
+    urls:
+    - https://github.com/TonyQ-Lab/actions-workflows/releases/download/my-app-0.1.2/my-app-0.1.2.tgz
+    version: 0.1.2
+generated: "2025-12-28T05:00:46.497663881Z"
