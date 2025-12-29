@@ -1,0 +1,60 @@
+name: Build image
+
+on:
+  workflow_call:
+    inputs:
+      push:
+        description: Whether to push image to repostory or not
+        required: false
+        type: boolean
+        default: false
+      registry:
+        description: 'Registry to push image to'
+        required: false
+        type: string
+        default: 'docker.io'
+      image-tag:
+        description: 'Tag to name the image'
+        required: true
+        type: string
+      build-dir:
+        description: Directory to run the build
+        required: false
+        type: string
+    secrets:
+      DOCKER_USERNAME:
+        required: false
+      DOCKER_PASSWORD:
+        required: false
+
+env:
+  REGISTRY: ${{ inputs.registry }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  build:
+    name: Build image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+    
+    - name: Build the image
+      working-directory: ${{ inputs.build-dir || github.workspace }}
+      run: |
+        docker build -t ${{ inputs.image-tag }} .
+
+    - name: Login to Docker
+      if: ${{ inputs.push == true }}
+      run: | 
+        if [[ -z "$DOCKER_USERNAME" || -z "$DOCKER_PASSWORD" ]]; then
+          echo "::error::Input 'username' and 'password' is required when enabling push"
+          exit 1
+        fi
+        echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u "$DOCKER_USERNAME" --password-stdin
+
+    - name: Push the image
+      if: ${{ inputs.push == true }}
+      run: docker push ${{ inputs.image-tag }}
+        
